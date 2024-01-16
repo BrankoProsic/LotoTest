@@ -4,6 +4,7 @@
     {
         private const int maxSelection = 7;
         private List<Button> selectedButtons = new List<Button>();
+
         //List<int> parsedValues = new List<int>();
 
         public Form1()
@@ -21,7 +22,7 @@
         {
             foreach (Button button in selectedButtons)
             {
-                button.Click += Button_Click; 
+                button.Click += Button_Click;
             }
         }
 
@@ -30,7 +31,7 @@
             Button clickedBtn = (Button)sender;
 
             if (selectedButtons.Contains(clickedBtn))
-            { 
+            {
                 selectedButtons.Remove(clickedBtn);
                 clickedBtn.BackColor = SystemColors.Control;
                 clickedBtn.ForeColor = SystemColors.ControlText;
@@ -42,11 +43,11 @@
                     selectedButtons.Add(clickedBtn);
                     clickedBtn.BackColor = Color.Red;
                     clickedBtn.ForeColor = Color.White;
-                    if(selectedButtons.Count == maxSelection)
+                    if (selectedButtons.Count == maxSelection)
                     {
                         DialogResult result = MessageBox.Show
-                            ("Odabrali ste 7/7 brojeva.\n\nDa li želite sortiranje brojeva?", "LOTO 7/39", 
-                            MessageBoxButtons.YesNo, 
+                            ("Odabrali ste 7/7 brojeva.\n\nDa li želite sortiranje brojeva?", "LOTO 7/39",
+                            MessageBoxButtons.YesNo,
                             MessageBoxIcon.Information);
 
                         if (result == DialogResult.Yes)
@@ -204,11 +205,10 @@
                 button.ForeColor = SystemColors.ControlText;
             }
         }
-        
 
         private void btnSort_Click(object sender, EventArgs e)
         {
-            if(selectedButtons.Count != 7)
+            if (selectedButtons.Count != 7)
             {
                 MessageBox.Show("Odaberite 7 brojeva!", "LOTO 7/39", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -217,13 +217,21 @@
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (selectedButtons.Count != 7)
+            List<int> selectedNumbers;
+            
+            //if (selectedButtons.Count != 7)
+            if (selectedButtons.Count == 7)
             {
-                MessageBox.Show("Odaberite 7 brojeva.", "LOTO 7/39", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                //MessageBox.Show("Odaberite 7 brojeva.", "LOTO 7/39", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //return;
+                selectedNumbers = selectedButtons.Select(button => int.Parse(button.Text)).ToList();
+            }
+            else
+            {
+                selectedNumbers = RandomNumbersFromLabels();
             }
 
-            List<int> selectedNumbers = selectedButtons.Select(button => int.Parse(button.Text)).ToList();
+            //List<int> selectedNumbers = selectedButtons.Select(button => int.Parse(button.Text)).ToList();
 
             LotteryCombination lotteryCombination = new LotteryCombination
             {
@@ -238,6 +246,31 @@
             }
 
             MessageBox.Show("Kombinacija je sačuvana.", "LOTO 7/39", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        // uraditi listu onih vrednosti/brojeva koji su vec u lejblima
+        private List<int> RandomNumbersFromLabels()
+        {
+            List<int> randomNumbersFromLabels = new List<int>();
+
+            for (int i = 1; i <= 7; i++)
+            {
+                string labelName = "label" + i;
+                Label label = Controls.Find(labelName, true).FirstOrDefault() as Label;
+
+                if (label != null && int.TryParse(label.Text, out int parsedValue))
+                {
+                    randomNumbersFromLabels.Add(parsedValue);
+                }
+                
+                else
+                {
+                    MessageBox.Show("Neuspešno učitavanje brojeva", "Greška", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return new List<int>(); 
+                }
+            }
+
+            return randomNumbersFromLabels;
         }
     }
 
