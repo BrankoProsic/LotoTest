@@ -1,14 +1,18 @@
-﻿namespace LotoTest
+﻿using LotoTest.Application;
+
+namespace LotoTest
 {
     public partial class Form1 : Form
     {
         private const int maxSelection = 7;
         private List<Button> selectedButtons = new List<Button>();
+        private readonly ILottoRepository _lottoRepository;
 
         //List<int> parsedValues = new List<int>();
 
-        public Form1()
+        public Form1(ILottoRepository lottoRepository)
         {
+            _lottoRepository = lottoRepository;
             InitializeComponent();
             InitializeButtons();
         }
@@ -239,11 +243,7 @@
                 DrawDate = DateTime.Now
             };
 
-            using (var dbContext = new LottoDbContext())
-            {
-                dbContext.LotteryCombinations.Add(lotteryCombination);
-                dbContext.SaveChanges();
-            }
+            _lottoRepository.Add(lotteryCombination);
 
             MessageBox.Show("Kombinacija je sačuvana.", "LOTO 7/39", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
